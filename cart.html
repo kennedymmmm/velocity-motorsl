@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velocity Motors - Cart</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>Your Cart</h1>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="products.html">Products</a>
+        <a href="cart.html">Cart</a>
+    </nav>
+</header>
+
+<div class="container">
+
+    <h2>Items in Cart</h2>
+
+    <table border="1" cellpadding="10" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Motorcycle</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody id="cartBody"></tbody>
+
+    </table>
+
+    <h2 id="total">Total: KSh 0</h2>
+
+    <button onclick="checkoutMpesa()">Checkout with M-Pesa</button>
+
+</div>
+
+<script>
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+const body = document.getElementById("cartBody");
+
+let total = 0;
+
+function displayCart(){
+
+    body.innerHTML = "";
+    total = 0;
+
+    if(cart.length === 0){
+
+        body.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align:center;">
+                    Your cart is empty.
+                </td>
+            </tr>
+        `;
+
+        document.getElementById("total").innerText = "Total: KSh 0";
+        return;
+    }
+
+    cart.forEach((item,index)=>{
+
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+
+        body.innerHTML += `
+            <tr>
+
+                <td>
+                    <img src="${item.image || ''}"
+                         width="70"
+                         height="70"
+                         style="object-fit:cover;border-radius:8px;">
+                </td>
+
+                <td>${item.name}</td>
+
+                <td>KSh ${item.price.toLocaleString()}</td>
+
+                <td>${item.quantity}</td>
+
+                <td>KSh ${itemTotal.toLocaleString()}</td>
+
+                <td>
+                    <button onclick="removeItem(${index})">
+                        Remove
+                    </button>
+                </td>
+
+            </tr>
+        `;
+
+    });
+
+    document.getElementById("total").innerText =
+        "Total: KSh " + total.toLocaleString();
+
+}
+
+function removeItem(index){
+
+    cart.splice(index,1);
+
+    localStorage.setItem("cart",JSON.stringify(cart));
+
+    displayCart();
+
+}
+
+function checkoutMpesa(){
+
+    if(cart.length===0){
+
+        alert("Your cart is empty.");
+
+        return;
+
+    }
+
+    let phone = prompt("Enter your M-Pesa number (2547XXXXXXXX)");
+
+    if(!phone) return;
+
+    alert(
+        "STK Push will be sent to " +
+        phone +
+        "\nAmount: KSh " +
+        total.toLocaleString()
+    );
+
+}
+
+displayCart();
+
+</script>
+
+</body>
+</html>
+
